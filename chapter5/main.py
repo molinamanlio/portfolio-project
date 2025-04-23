@@ -31,12 +31,12 @@ Get information about all the SWC fantasy football leagues and the teams in them
 
 #FastAPI constructor with additional details added for OpenAPI Specification
 app = FastAPI(
-    description=api_description, 2
-    title="Sports World Central (SWC) Fantasy Football API", 3
-    version="0.1" 4
+    description=api_description, 
+    title="Sports World Central (SWC) Fantasy Football API", 
+    version="0.1" 
 )
-
-
+# The API is a read-only API, so we don't need to add any authentication
+# or authorization to the API. The API is open to the public.
 # Dependency
 def get_db():
     db = SessionLocal()
@@ -72,37 +72,41 @@ def read_players(skip: int = 0,
     "/v0/players/{player_id}",
     response_model=schemas.Player,
     summary="Get one player using the Player ID, which is internal to SWC",
-    description="If you have an SWC Player ID of a player from another API " 
-    "call such as v0_get_players, you can call this API" 
-        "using the player ID",
-        response_description="One NFL player",
-        operation_id="v0_get_players_by_player_id",
+    description="If you have an SWC Player ID of a player from another API "
+                "call such as v0_get_players, you can call this API "
+                "using the player ID",
+    response_description="One NFL player",
+    operation_id="v0_get_players_by_player_id",
     tags=["player"]
 )
-def read_players(skip: int = Query(0, description="The number of items to"
-"skip at the beginning of API call."),
-  limit: int = Query(100, description="The number of records to return"
-    "after the skipped records."),
-  minimum_last_changed_date: date = Query(None, description="The minimum date of"
-    "change that you want to return records. Exclude any records changed before"
-    "this."),
-  first_name: str = Query(None, description="The first name of the players"
-    "to return"),
-  last_name: str = Query(None, description="The last name of the players"
-    "to return"),
-    db: Session = Depends(get_db)):
+def read_players(
+    skip: int = Query(0, description="The number of items to skip at the beginning of API call."),
+    limit: int = Query(100, description="The number of records to return after the skipped records."),
+    minimum_last_changed_date: date = Query(None, description="The minimum date of change that you want to return records. Exclude any records changed before this."),
+    first_name: str = Query(None, description="The first name of the players to return"),
+    last_name: str = Query(None, description="The last name of the players to return"),
+    db: Session = Depends(get_db)
+):
+    # Implementación de la función (puedes agregar lógica aquí)
+    pass
 
-@app.get("/v0/performances/", 
-         response_model=list[schemas.Performance],
-	    tags=["scoring"])
-def read_performances(skip: int = 0, 
-                limit: int = 100, 
-                minimum_last_changed_date: date = None, 
-                db: Session = Depends(get_db)):
-    performances = crud.get_performances(db, 
-                skip=skip, 
-                limit=limit, 
-                min_last_changed_date=minimum_last_changed_date)
+@app.get(
+    "/v0/performances/",
+    response_model=list[schemas.Performance],
+    tags=["scoring"]
+)
+def read_performances(
+    skip: int = 0,
+    limit: int = 100,
+    minimum_last_changed_date: date = None,
+    db: Session = Depends(get_db)
+):
+    performances = crud.get_performances(
+        db,
+        skip=skip,
+        limit=limit,
+        min_last_changed_date=minimum_last_changed_date
+    )
     return performances
 
 @app.get("/v0/leagues/{league_id}", 
