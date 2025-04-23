@@ -1,5 +1,5 @@
 """FastAPI program - Chapter 4"""
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI, Query, HTTPException
 from sqlalchemy.orm import Session
 from datetime import date
 
@@ -72,25 +72,29 @@ def read_players(skip: int = 0,
     "/v0/players/{player_id}",
     response_model=schemas.Player,
     summary="Get one player using the Player ID, which is internal to SWC",
-    description="If you have an SWC Player ID of a player from another API
-        call such as v0_get_players, you can call this API
-        using the player ID",
+    description="If you have an SWC Player ID of a player from another API " 
+    "call such as v0_get_players, you can call this API" 
+        "using the player ID",
         response_description="One NFL player",
         operation_id="v0_get_players_by_player_id",
     tags=["player"]
 )
-def read_player(player_id: int, 
-                db: Session = Depends(get_db)):
-    player = crud.get_player(db, 
-                             player_id=player_id)
-    if player is None:
-        raise HTTPException(status_code=404, 
-                            detail="Player not found")
-    return player
+def read_players(skip: int = Query(0, description="The number of items to"
+"skip at the beginning of API call."),
+  limit: int = Query(100, description="The number of records to return"
+    "after the skipped records."),
+  minimum_last_changed_date: date = Query(None, description="The minimum date of"
+    "change that you want to return records. Exclude any records changed before"
+    "this."),
+  first_name: str = Query(None, description="The first name of the players"
+    "to return"),
+  last_name: str = Query(None, description="The last name of the players"
+    "to return"),
+    db: Session = Depends(get_db)):
 
 @app.get("/v0/performances/", 
-         response_model=list[schemas.Performance,
-	tags="scoring"])
+         response_model=list[schemas.Performance],
+	    tags=["scoring"])
 def read_performances(skip: int = 0, 
                 limit: int = 100, 
                 minimum_last_changed_date: date = None, 
@@ -112,7 +116,7 @@ def read_league(league_id: int,db: Session = Depends(get_db)):
 
 
 @app.get("/v0/leagues/", 
-	response_model=list[schemas.League,
+	response_model=list[schemas.League],
 	tags=["membership"])
 def read_leagues(skip: int = 0, 
                 limit: int = 100, 
@@ -127,7 +131,7 @@ def read_leagues(skip: int = 0,
     return leagues
 
 @app.get("/v0/teams/", 
-	response_model=list[schemas.Team,
+	response_model=list[schemas.Team],
 	tags=["membership"])
 def read_teams(skip: int = 0, 
                limit: int = 100, 
