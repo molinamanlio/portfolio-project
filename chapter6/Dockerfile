@@ -3,7 +3,7 @@
 FROM python:3.10-slim 
 
 # set the Docker working directory
-WORKDIR /code 2
+WORKDIR /code 
 
 # copy from the build context directory to the Docker working directory 
 COPY requirements.txt /code/ 
